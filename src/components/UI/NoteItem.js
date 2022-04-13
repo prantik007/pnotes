@@ -6,6 +6,7 @@ import {
   Text,
   Button,
   useColorModeValue,
+  Divider,
 } from '@chakra-ui/react';
 
 const NotesList = ({ id, title, details, onDelete }) => {
@@ -13,21 +14,25 @@ const NotesList = ({ id, title, details, onDelete }) => {
     onDelete(id);
   };
   return (
-    <WrapItem>
+    <WrapItem key={id}>
       <Box
         display={'flex'}
         flexDirection={'column'}
         minW={'400px'}
-        minH={'200px'}
-        border={'solid 1px'}
+        
+        
         rounded={'lg'}
         m={3}
         p={2}
+       bgColor={useColorModeValue('gray.50','gray.800')}
+        backdropBlur={'20px'}
+        boxShadow={'xl'}
       >
-        <Heading fontSize={'2xl'} mb={2}>
+        <Heading fontSize={'2xl'} p={2} mb={2} color={useColorModeValue('green.500','green.300')}>
           {title}
         </Heading>
-        <Text minH="105px">{details}</Text>
+        <Divider/>
+        <Text minH="105px" p={3}>{details}</Text>
         <Button
           bgColor={useColorModeValue('red.500', 'red.800')}
           color={useColorModeValue('white', 'white')}

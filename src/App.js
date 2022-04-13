@@ -17,16 +17,20 @@ import Signup from './components/Signup';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import About from './components/About';
+import { customTheme } from './components/UI/extendTheme';
+
 
 function App() {
   return (
-    <ChakraProvider theme={theme}>
+    <ChakraProvider theme={customTheme}>
       <Router>
         <Header />
         <Routes>
           <Route exact path="/" element={<Home />} />
           <Route exact path="/signup" element={<Signup />} />
           <Route exact path="/login" element={<Login />} />
+          <Route exact path="/about" element={<About />} />
           <Route
             exact
             path="/dashboard"

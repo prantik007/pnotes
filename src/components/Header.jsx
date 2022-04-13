@@ -64,8 +64,8 @@ const Header = () => {
               <NavLinkItem text="Signup" />
             </Link>
           )}
-
-          <NavLinkItem text="About" />
+            <Link to="/about"><NavLinkItem text="About" /></Link>
+          
           {user && (
             <Button color="red" onClick={handleLogout}>
               Logout

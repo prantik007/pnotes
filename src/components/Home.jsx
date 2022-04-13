@@ -10,7 +10,7 @@ import {
   createIcon,
   Center,
 } from '@chakra-ui/react';
-
+import { Link } from 'react-router-dom';
 const Home = () => {
   return (
     <Flex direction="column" justify="center" alignItems="center" mt={36}>
@@ -26,43 +26,27 @@ const Home = () => {
           </Text>
         </Center>
       </Heading>
-      <Stack mt={24}>
-        <Button
-          colorScheme={'green'}
-          bg={'green.400'}
-          rounded={'full'}
-          px={6}
-          _hover={{
-            bg: 'green.500',
-          }}
-        >
-          Sign Up
-        </Button>
-        <Button variant={'link'} colorScheme={'blue'} size={'sm'}>
-          Learn more
-        </Button>
-      </Stack>
+      <Stack mt={24} justify='center' alignItems={'center'}>
+        <Link to="/signup">
+          <Button
+            colorScheme={'green'}
+            bg={'green.400'}
+            rounded={'full'}
+            px={6}
+            _hover={{
+              bg: 'green.500',
+            }}
+          >
+            Sign Up
+          </Button>
+        </Link>
+        <Link to="/about">
+          <Button variant={'link'} colorScheme={'blue'} size={'sm'}>
 
-      <Box>
-        <Icon
-          as={Arrow}
-          color={'white'}
-          w={71}
-          position={'absolute'}
-          right={820}
-          top={'500px'}
-        />
-        <Text
-          fontSize={'lg'}
-          fontFamily={'Caveat'}
-          position={'absolute'}
-          right={'800px'}
-          top={'470px'}
-          transform={'rotate(10deg)'}
-        >
-          It's free
-        </Text>
-      </Box>
+            Learn more
+          </Button>
+        </Link>
+      </Stack>
     </Flex>
   );
 };

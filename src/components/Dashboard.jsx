@@ -1,7 +1,10 @@
 import {
   Box,
   Button,
+  calc,
+  CircularProgress,
   Container,
+  Divider,
   Flex,
   Heading,
   HStack,
@@ -10,6 +13,7 @@ import {
   Stack,
   Text,
   Textarea,
+  useBoolean,
   useColorModeValue,
   VStack,
   Wrap,
@@ -32,7 +36,11 @@ import {
 } from 'firebase/firestore';
 import { database } from '../Firebase/config';
 import { auth } from './../Firebase/config';
-import NotesList from './UI/NotesList';
+import NoteItem from './UI/NoteItem';
+import EmptyNotes from './UI/EmptyNotes';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import {FcCheckmark} from 'react-icons/fc'
+import 'react-loading-skeleton/dist/skeleton.css';
 
 const Dashboard = () => {
   const [noteTitleInput, setNoteTitleInput] = useState('');
@@ -42,7 +50,7 @@ const Dashboard = () => {
   const [notesList, setNotesList] = useState([{}]);
   const [addNotesMessage, setAddNotesMessage] = useState('');
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const user = useAuth();
 
@@ -53,12 +61,11 @@ const Dashboard = () => {
       setUserName(uname);
     }
 
-    getName();
-  }, []);
+    getName().then(() => setIsLoading(false));
+  }, [user]);
 
   useEffect(() => {
     async function getAllNotes() {
-      setIsLoading(true);
       const email = user.email;
 
       const q = query(collection(database, 'notes', email, 'notes'));
@@ -67,11 +74,6 @@ const Dashboard = () => {
         const notes = [];
 
         querySnapshot.forEach(doc => {
-          console.log(
-            '🚀 ~ file: Dashboard.jsx ~ line 70 ~ getAllNotes ~ doc',
-            doc.id
-          );
-
           notes.push({
             id: doc.id,
             title: doc.data().title,
@@ -80,9 +82,8 @@ const Dashboard = () => {
         });
 
         setNotesList(notes);
-      });
 
-      setIsLoading(false);
+      });
     }
 
     getAllNotes();
@@ -92,12 +93,22 @@ const Dashboard = () => {
     if (noteTitleInput.trim() === '' || noteDetailsInput.trim() === '') {
       setAddNotesMessage('Please fill empty fields');
     } else {
-      setAddNotesMessage('Adding Note...');
+      setAddNotesMessage(
+        <Flex align="center">
+          <CircularProgress
+            isIndeterminate
+            color="green.300"
+            size={'35px'}
+            mr={5}
+          />
+          <Text color={'red'}>Adding Note...</Text>
+        </Flex>
+      );
 
       await addNote(noteTitleInput, noteDetailsInput, user.email);
       setNoteTitleInput('');
       setNoteDetailsInput('');
-      setAddNotesMessage('Note Added');
+      setAddNotesMessage(<Flex ><FcCheckmark size={'30px'}/><Text ml={4}>Note Added</Text></Flex>);
     }
   };
 
@@ -108,25 +119,27 @@ const Dashboard = () => {
   return (
     <>
       <Flex
-        bg={useColorModeValue('gray.50', 'gray.800')}
-        minH={'100%'}
+        //bg={useColorModeValue('gray.50', 'gray.700')}
+        minH={400}
         align={'center'}
         justify={'center'}
         direction={'column'}
       >
         <VStack
-          mt={10}
+          
           rounded={'lg'}
-          boxShadow={'lg'}
+          boxShadow={'xl'}
           minH={'300px'}
           minW={'500px'}
           borderWidth={'1px'}
           borderColor={'green.400'}
-          bg={useColorModeValue('white', 'gray.700')}
+          bg={useColorModeValue('white', 'gray.800')}
+          
         >
           <Heading fontSize={'3xl'} color={'green.400'} p={6}>
             Add new note...
           </Heading>
+
           <Stack spacing={3} w={'full'} pl={6} pr={6}>
             <Input
               variant="flushed"
@@ -159,24 +172,38 @@ const Dashboard = () => {
           </Stack>
         </VStack>
       </Flex>
-      <Flex ml={14}>
-        <Heading>{username}'s Notes</Heading>
+
+      <Flex ml={14} mt={10} >
+        {isLoading ? (
+          <SkeletonTheme baseColor={'teal'}>
+            <p>
+              <Skeleton width={300} height={45} />
+            </p>
+          </SkeletonTheme>
+        ) : (
+          <Heading >{username}'s Notes</Heading>
+        )}
+        
       </Flex>
       <br />
       <Flex ml={14}>
-        <Wrap spacing={0}>
-          {notesList.map(item => {
-            return (
-              <NotesList
-                key={item.id}
-                id={item.id}
-                title={item.title}
-                details={item.details}
-                onDelete={() => handleDeleteNote(item.id)}
-              />
-            );
-          })}
-        </Wrap>
+        {notesList.length === 0 ? (
+          <EmptyNotes />
+        ) : (
+          <Wrap spacing={0}>
+            {notesList.map(item => {
+              return (
+                <NoteItem
+                  key={item.id}
+                  id={item.id}
+                  title={item.title}
+                  details={item.details}
+                  onDelete={() => handleDeleteNote(item.id)}
+                />
+              );
+            })}
+          </Wrap>
+        )}
       </Flex>
     </>
   );
